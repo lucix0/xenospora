@@ -94,6 +94,8 @@ add_executable(${PROJECT_NAME}
         ${SHADER_SOURCE}/vs_gbuffer.sc
         ${SHADER_SOURCE}/fs_composite.sc
         ${SHADER_SOURCE}/fs_gbuffer.sc
+        include/engine/shader_manager.h
+        "src/engine/shader_ manager.cpp"
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE
