@@ -7,8 +7,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
-set(SHADER_SOURCE ${CMAKE_SOURCE_DIR}/shaders/src)
-set(SHADER_BINARY ${CMAKE_SOURCE_DIR}/shaders/bin)
+set(SHADER_SOURCE ${CMAKE_SOURCE_DIR}/shaders)
 
 include(FetchContent)
 
@@ -54,14 +53,14 @@ bgfx_compile_shaders(
         TYPE VERTEX
         SHADERS ${SHADER_SOURCE}/vs_composite.sc ${SHADER_SOURCE}/vs_gbuffer.sc
         VARYING_DEF ${SHADER_SOURCE}/varying.def.sc
-        OUTPUT_DIR ${SHADER_BINARY}
+        OUTPUT_DIR ${CMAKE_BINARY_DIR}/shaders/
 )
 
 bgfx_compile_shaders(
         TYPE FRAGMENT
         SHADERS ${SHADER_SOURCE}/fs_composite.sc ${SHADER_SOURCE}/fs_gbuffer.sc
         VARYING_DEF ${SHADER_SOURCE}/varying.def.sc
-        OUTPUT_DIR ${SHADER_BINARY}
+        OUTPUT_DIR ${CMAKE_BINARY_DIR}/shaders/
 )
 
 add_executable(${PROJECT_NAME}
@@ -95,7 +94,7 @@ add_executable(${PROJECT_NAME}
         ${SHADER_SOURCE}/fs_composite.sc
         ${SHADER_SOURCE}/fs_gbuffer.sc
         include/engine/shader_manager.h
-        "src/engine/shader_ manager.cpp"
+        src/engine/shader_manager.cpp
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE

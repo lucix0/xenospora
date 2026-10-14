@@ -6,8 +6,8 @@
 bgfx::ShaderHandle ShaderProgram::loadShader(const std::string& name, ShaderType type) {
     // Create shader file path depending on type of shader
     std::string path{};
-    if (type == ShaderType::VERTEX)        path = "shaders/bin/vs_" + name + ".bin";
-    else if (type == ShaderType::FRAGMENT) path = "shaders/bin/fs_" + name + ".bin";
+    if (type == ShaderType::VERTEX)        path = "shaders/metal/vs_" + name + ".sc.bin";
+    else if (type == ShaderType::FRAGMENT) path = "shaders/metal/fs_" + name + ".sc.bin";
 
     // Open shader binary file
     std::ifstream file(path, std::ios::binary | std::ios::ate);
