@@ -1,41 +1,26 @@
-cmake_minimum_required(VERSION 3.20)
+cmake_minimum_required(VERSION 3.21)
 project(Xenospora LANGUAGES CXX)
 
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
-set(BGFX_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/third_party/bgfx)
-
-add_library(bgfx STATIC IMPORTED GLOBAL)
-set_target_properties(bgfx PROPERTIES
-    IMPORTED_LOCATION
-        ${BGFX_ROOT}/lib/libbgfxRelease.a
-    INTERFACE_INCLUDE_DIRECTORIES
-        ${BGFX_ROOT}/include
-)
-
-add_library(bx STATIC IMPORTED GLOBAL)
-set_target_properties(bx PROPERTIES
-    IMPORTED_LOCATION
-        ${BGFX_ROOT}/lib/libbxRelease.a
-    INTERFACE_INCLUDE_DIRECTORIES
-        ${BGFX_ROOT}/include
-    INTERFACE_COMPILE_DEFINITIONS
-        BX_CONFIG_DEBUG=0
-)
-
-add_library(bimg STATIC IMPORTED GLOBAL)
-set_target_properties(bimg PROPERTIES
-    IMPORTED_LOCATION
-        ${BGFX_ROOT}/lib/libbimgRelease.a
-    INTERFACE_INCLUDE_DIRECTORIES
-        ${BGFX_ROOT}/include
-)
+set(SHADER_SOURCE ${CMAKE_SOURCE_DIR}/shaders/src)
+set(SHADER_BINARY ${CMAKE_SOURCE_DIR}/shaders/bin)
 
 include(FetchContent)
+
+# --- bgfx ---
+set(BGFX_BUILD_EXAMPLES OFF CACHE BOOL "Build bgfx examples" FORCE)
+set(BGFX_BUILD_TOOLS    ON  CACHE BOOL "Build bgfx tools"    FORCE)
+FetchContent_Declare(
+        bgfx
+        GIT_REPOSITORY https://github.com/bkaradzic/bgfx.cmake.git
+        GIT_TAG v1.166.9546-589
+)
+FetchContent_MakeAvailable(bgfx)
 
 # --- GLFW ---
 FetchContent_Declare(
@@ -55,6 +40,29 @@ FetchContent_Declare(
         GIT_TAG        v5.1.0
 )
 FetchContent_MakeAvailable(thread_pool)
+
+# --- FastNoiseLite ---
+FetchContent_Declare(
+        FastNoiseLite
+        GIT_REPOSITORY https://github.com/Auburn/FastNoiseLite.git
+        GIT_TAG        v1.1.1
+)
+FetchContent_MakeAvailable(FastNoiseLite)
+
+# Shaders
+bgfx_compile_shaders(
+        TYPE VERTEX
+        SHADERS ${SHADER_SOURCE}/vs_composite.sc ${SHADER_SOURCE}/vs_gbuffer.sc
+        VARYING_DEF ${SHADER_SOURCE}/varying.def.sc
+        OUTPUT_DIR ${SHADER_BINARY}
+)
+
+bgfx_compile_shaders(
+        TYPE FRAGMENT
+        SHADERS ${SHADER_SOURCE}/fs_composite.sc ${SHADER_SOURCE}/fs_gbuffer.sc
+        VARYING_DEF ${SHADER_SOURCE}/varying.def.sc
+        OUTPUT_DIR ${SHADER_BINARY}
+)
 
 add_executable(${PROJECT_NAME}
         src/game/main.cpp
@@ -80,13 +88,12 @@ add_executable(${PROJECT_NAME}
         include/game/chunk_renderer.h
         src/game/chunk_generator.cpp
         include/game/chunk_generator.h
-        third_party/FastNoiseLite.h
         src/engine/deferred_renderer.cpp
         include/engine/deferred_renderer.h
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE
-    ${CMAKE_SOURCE_DIR}/src ${CMAKE_SOURCE_DIR}/third_party ${thread_pool_SOURCE_DIR}/include include
+    ${CMAKE_SOURCE_DIR}/src ${thread_pool_SOURCE_DIR}/include ${fastnoiselite_SOURCE_DIR}/Cpp include
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
@@ -94,20 +101,4 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     bx
     bimg
     glfw
-)
-
-target_link_libraries(${PROJECT_NAME} PRIVATE
-    "-framework Cocoa"
-    "-framework Metal"
-    "-framework QuartzCore"
-    "-framework IOKit"
-    "-framework CoreMedia"
-    "-framework VideoToolbox"
-)
-
-add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_directory
-        ${CMAKE_SOURCE_DIR}/shaders/bin
-        $<TARGET_FILE_DIR:${PROJECT_NAME}>/shaders
-    COMMENT "Copying shader binaries to output directory"
 )

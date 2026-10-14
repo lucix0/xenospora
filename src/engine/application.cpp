@@ -32,7 +32,7 @@ bool Application::init(int width, int height, const std::string& name) {
     init.type = bgfx::RendererType::Count;
     init.swapChain.width = width;
     init.swapChain.height = height;
-    init.reset = BGFX_RESET_VSYNC;
+    // init.reset = BGFX_RESET_VSYNC;
 
     if (!bgfx::init(init)) {
         std::cerr << "Failed to initialize BGFX\n";
