@@ -90,6 +90,10 @@ add_executable(${PROJECT_NAME}
         include/game/chunk_generator.h
         src/engine/deferred_renderer.cpp
         include/engine/deferred_renderer.h
+        ${SHADER_SOURCE}/vs_composite.sc
+        ${SHADER_SOURCE}/vs_gbuffer.sc
+        ${SHADER_SOURCE}/fs_composite.sc
+        ${SHADER_SOURCE}/fs_gbuffer.sc
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE

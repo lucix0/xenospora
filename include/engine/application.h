@@ -20,6 +20,8 @@
     #include <GLFW/glfw3native.h>
 #endif
 
+#include <memory>
+
 class Application {
 public:
     bool init(int width = 1280, int height = 720, const std::string &name = "application");

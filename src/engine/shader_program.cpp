@@ -1,6 +1,7 @@
 #include <engine/shader_program.h>
 #include <fstream>
 #include <iostream>
+#include <vector>
 
 bgfx::ShaderHandle ShaderProgram::loadShader(const std::string& name, ShaderType type) {
     // Create shader file path depending on type of shader

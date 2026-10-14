@@ -1,4 +1,5 @@
 #include "game/world.h"
+#include <cmath>
 
 Chunk& World::getOrCreateChunk(ChunkCoord coord) {
     return m_chunks[coord];
