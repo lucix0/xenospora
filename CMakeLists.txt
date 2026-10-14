@@ -53,14 +53,14 @@ bgfx_compile_shaders(
         TYPE VERTEX
         SHADERS ${SHADER_SOURCE}/vs_composite.sc ${SHADER_SOURCE}/vs_gbuffer.sc
         VARYING_DEF ${SHADER_SOURCE}/varying.def.sc
-        OUTPUT_DIR ${CMAKE_BINARY_DIR}/shaders/
+        OUTPUT_DIR ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/shaders
 )
 
 bgfx_compile_shaders(
         TYPE FRAGMENT
         SHADERS ${SHADER_SOURCE}/fs_composite.sc ${SHADER_SOURCE}/fs_gbuffer.sc
         VARYING_DEF ${SHADER_SOURCE}/varying.def.sc
-        OUTPUT_DIR ${CMAKE_BINARY_DIR}/shaders/
+        OUTPUT_DIR ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/shaders
 )
 
 add_executable(${PROJECT_NAME}
@@ -93,8 +93,6 @@ add_executable(${PROJECT_NAME}
         ${SHADER_SOURCE}/vs_gbuffer.sc
         ${SHADER_SOURCE}/fs_composite.sc
         ${SHADER_SOURCE}/fs_gbuffer.sc
-        include/engine/shader_manager.h
-        src/engine/shader_manager.cpp
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE
@@ -106,4 +104,11 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     bx
     bimg
     glfw
+)
+
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory_if_different
+        ${CMAKE_SOURCE_DIR}/textures
+        $<TARGET_FILE_DIR:${PROJECT_NAME}>/textures
+    COMMENT "Copying assets next to the executable"
 )
